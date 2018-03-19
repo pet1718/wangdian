@@ -7,5 +7,5 @@
     },
     "require": {
         "monolog/monolog": "*"
-    },
+    }
 }
