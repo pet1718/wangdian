@@ -6,6 +6,11 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use petcircle\wangdian\exceptions\HttpResponseException;
 
+/**
+ * 旺店通sdk
+ *
+ * @author Atans
+ */
 class Wangdian
 {
 
@@ -103,18 +108,54 @@ class Wangdian
                 $this->$key = $value;
             }
         }
-
     }
 
     /**
-     * 原订单推送
+     * 1.原订单推送
      *
+     * @param array $ata
+     * @return array
+     * @throws HttpResponseException
      */
     public function tradePush($ata)
     {
-        $api = $this->getApiUrl('openapi2/trade_push.php');
-
         return $this->post($this->getApiUrl('openapi2/trade_push.php'), $data);
+    }
+
+    /**
+     * 4.库存查询
+     *
+     * @param array $ata
+     * @return array
+     * @throws HttpResponseException
+     */
+    public function stockQuery($ata)
+    {
+        return $this->post($this->getApiUrl('openapi2/stock_query.php'), $data);
+    }
+
+    /**
+     * 6.订单查询
+     *
+     * @param array $data
+     * @return array
+     * @throws HttpResponseException
+     */
+    public function tradeQuery($data)
+    {
+        return $this->post($this->getApiUrl('openapi2/trade_query.php'), $data);
+    }
+
+    /**
+     * 7.创建货品档案
+     *
+     * @param array $data
+     * @return array
+     * @throws HttpResponseException
+     */
+    public function goodsPush($data)
+    {
+        return $this->post($this->getApiUrl('openapi2/goods_push.php'), $data);
     }
 
     /**
@@ -124,7 +165,7 @@ class Wangdian
      * @param array $postData
      * @param int $retry
      * @return array
-     * @throws Exception
+     * @throws HttpResponseException
      */
     public function post($url, $postData, $retry = 2)
     {
@@ -133,6 +174,7 @@ class Wangdian
         $postData['shop_no']   = $this->shopNo;
         $postData['timestamp'] = time();
 
+        // array value to json
         foreach ($postData as $key => &$value) {
             if (is_array($value)) {
                 $value = json_encode($value, JSON_UNESCAPED_UNICODE);
@@ -144,7 +186,7 @@ class Wangdian
 
         $logger = $this->getLogger();
 
-        $logger->info(sprintf("Request: %s:", $url, $postData));
+        $logger->info(sprintf("Request: %s:", $url), $postData);
 
         $handle = curl_init();
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
@@ -202,40 +244,6 @@ class Wangdian
     }
 
     /**
-     * @param array $req
-     * @return string
-     */
-    protected function packData(&$req)
-    {
-        ksort($req);//先排序
-
-        $arr = array();
-        foreach($req as $key => $val)
-        {
-            if($key == 'sign') {
-                continue;
-            }
-
-            if(count($arr)) {
-                $arr[] = ';';
-            }
-
-            //键key的长度用2位数字表示
-            $arr[] = sprintf("%02d", iconv_strlen($key, 'UTF-8'));
-            $arr[] = '-';
-            $arr[] = $key;
-            $arr[] = ':';
-
-            //值value的长度用4位数字表示
-            $arr[] = sprintf("%04d", iconv_strlen($val, 'UTF-8'));
-            $arr[] = '-';
-            $arr[] = $val;
-        }
-
-        return implode('', $arr);
-    }
-
-    /**
      * 计算sign值
      *
      * @param array $req
@@ -245,6 +253,40 @@ class Wangdian
     {
         $sign = md5($this->packData($req) . $app_secret);
         $req['sign'] = $sign;
+    }
+
+    /**
+     * @param array $req
+     * @return string
+     */
+    protected function packData(&$req)
+    {
+        ksort($req);//先排序
+
+        $converted = [];
+        foreach($req as $key => $value)
+        {
+            if($key == 'sign') {
+                continue;
+            }
+
+            if(count($converted)) {
+                $converted[] = ';';
+            }
+
+            //键key的长度用2位数字表示
+            $converted[] = sprintf("%02d", iconv_strlen($key, 'UTF-8'));
+            $converted[] = '-';
+            $converted[] = $key;
+            $converted[] = ':';
+
+            //值value的长度用4位数字表示
+            $converted[] = sprintf("%04d", iconv_strlen($value, 'UTF-8'));
+            $converted[] = '-';
+            $converted[] = $value;
+        }
+
+        return implode('', $converted);
     }
 
     /**
