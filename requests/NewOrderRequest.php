@@ -9,6 +9,11 @@ class NewOrderRequest extends AbstractRequest
 {
     /**
      * 必填
+     * 0 普通入庫
+     * 1 普通出庫
+     * 2 採購入庫
+     * 3 銷售訂單
+     *
      * @var integer 出入库类型标记
      * @see Standard
      */
@@ -180,7 +185,7 @@ class NewOrderRequest extends AbstractRequest
     /**
      * @var string 交易时间
      */
-    public $TradeTIme;
+    public $TradeTime;
 
     /**
      * @var 支付单号

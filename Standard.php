@@ -69,7 +69,7 @@ class Standard
      *
      * @var string
      */
-    private $apiHost = 'http://api.wangdian.cn';
+    private $apiHost;
 
     /**
      * @var string
@@ -109,7 +109,7 @@ class Standard
     public function __construct(array $config)
     {
         foreach ($config as $key => $value) {
-            if (isset($this->$key)) {
+            if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
@@ -286,30 +286,42 @@ class Standard
 
         $jsonedContent = (string) $request;
 
-        $sign = base64_encode($jsonedContent . $key);
+        $sign = base64_encode(md5($jsonedContent . $key));
 
         $data = [
             'Method'      => $method,
             'SellerID'    => $this->sellerId,
             'InterfaceID' => $this->interfaceId,
-            'content'     => $jsonedContent,
-            'sign'        => $sign,
+            'Content'     => $jsonedContent,
+            'Sign'        => $sign,
         ];
 
-        if ($this->debug) {
-            $this->getLogger()->info(sprintf("Request: %s:", $url), $postData);
+        foreach ($data as $key => &$value) {
+            $value = urlencode($value);
         }
 
+        $url = $this->apiHost;
+
+        if ($this->debug) {
+            $this->getLogger()->info(sprintf("Request: %s:", $url), $data);
+        }
+
+        $post_data = http_build_query($data);
+        $length = strlen($post_data);
+
         $handle = curl_init();
+        curl_setopt($handle,CURLOPT_HTTP_VERSION,CURL_HTTP_VERSION_1_1);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($handle,CURLOPT_HTTPHEADER,array("Content-Type: application/x-www-form-urlencoded","Content-length: ".$length));
 
         curl_setopt($handle, CURLOPT_URL, $url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($handle, CURLOPT_POST, true);
-        curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($postData));
+        curl_setopt($handle,CURLOPT_POSTFIELDS,$post_data);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
+        $retry = 1;
         do {
             $content = curl_exec($handle);
             $retry--;
@@ -352,7 +364,7 @@ class Standard
     public function getLogger()
     {
         if (! $this->logger instanceof  Logger) {
-            $logger = new Logger();
+            $logger = new Logger('wangdian_standard');
 
             $level = $this->debug ? Logger::DEBUG : Logger::ERROR;
 
@@ -362,16 +374,5 @@ class Standard
         }
 
         return $this->logger;
-    }
-
-    /**
-     * 拼接API
-     *
-     * @param string $uri
-     * @return string
-     */
-    protected function getApiUrl($uri)
-    {
-        return rtrim($this->apiHost, '/') . '/' . ltrim($uri, '/');
     }
 }

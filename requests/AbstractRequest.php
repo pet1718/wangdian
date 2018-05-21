@@ -5,16 +5,13 @@ namespace petcircle\wangdian\requests;
 
 abstract class AbstractRequest
 {
-    public $data;
-
     /**
      * constructor.
      *
      * @param array $data
      */
-    public function __construct(array $data)
+    public function __construct(array $data = [])
     {
-        $this->data = $data;
         if (! empty($data)) {
             foreach ($data as $key => $value) {
                 $this->$key = $value;
@@ -30,11 +27,15 @@ abstract class AbstractRequest
     public function toArray()
     {
         $fields = get_object_vars($this);
-        $fields = array_combine($fields, $fields);
+        $fields = array_keys($fields);
+
+
 
         $data = [];
         foreach ($fields as $field) {
-            $data[$field] = $this->$field;
+            if (! is_null($this->$field)) {
+                $data[$field] = $this->$field;
+            }
         }
 
         return $data;

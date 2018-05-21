@@ -2,6 +2,9 @@
 
 namespace petcircle\wangdian\requests;
 
+/***
+ * 12.查詢ERP貨品信息
+ */
 class QueryGoodsInfoRequest extends AbstractRequest
 {
     /**
