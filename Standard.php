@@ -28,6 +28,15 @@ use petcircle\wangdian\results\NewOrder;
  */
 class Standard
 {
+    const LOG_BLOCK = 1;
+    const LOG_UNCLOCK = 0;
+
+    /**
+     * 单据类型 (1是订单 ,2是采购单)
+     */
+    const ORDER_TYPE_ORDER          = 1;
+    const ORDER_TYPE_PURCHASE_ORDER = 2;
+
     /**
      * 出入库类型标记（0普通入库，1普通出库，2采购入库，3销售订单）
      */
@@ -346,7 +355,7 @@ class Standard
         $resultClass = sprintf('\petcircle\wangdian\results\%sResult', $method);
 
         // 未定義用默認的BaseResult
-        if (class_exists($resultClass)) {
+        if (! class_exists($resultClass)) {
             $resultClass = '\petcircle\wangdian\results\BaseResult';
         }
 

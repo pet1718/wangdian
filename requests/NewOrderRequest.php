@@ -110,7 +110,7 @@ class NewOrderRequest extends AbstractRequest
     /**
      * @var string 订单所属店铺名称 (出库时非空)
      */
-    public $shopName;
+    public $ShopName;
 
     /**
      * @var string 客户平台昵称
@@ -145,12 +145,12 @@ class NewOrderRequest extends AbstractRequest
     /**
      * @var string 收货人所在区、县 （出库时非空）
      */
-    public $BuyerDistract;
+    public $BuyerDistrict;
 
     /**
      * @var string 收货人地址 （出库时非空）
      */
-    public $BuyerAddr;
+    public $BuyerAdr;
 
     /**
      * @var string 收货人Email
