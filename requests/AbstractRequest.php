@@ -29,8 +29,6 @@ abstract class AbstractRequest
         $fields = get_object_vars($this);
         $fields = array_keys($fields);
 
-
-
         $data = [];
         foreach ($fields as $field) {
             if (! is_null($this->$field)) {
@@ -48,8 +46,6 @@ abstract class AbstractRequest
      */
     public function __toString()
     {
-        return json_encode($this->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return json_encode($this->toArray(), JSON_UNESCAPED_UNICODE);
     }
-
-
 }

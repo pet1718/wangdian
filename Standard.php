@@ -6,20 +6,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use petcircle\wangdian\exceptions\Exception;
 use petcircle\wangdian\exceptions\HttpResponseException;
-use petcircle\wangdian\requests\AbstractRequest;
-use petcircle\wangdian\requests\CancelOrderRequest;
-use petcircle\wangdian\requests\NewOrderRequest;
-use petcircle\wangdian\requests\QueryGoodsInfoRequest;
-use petcircle\wangdian\requests\QueryStockoutOrderPurchaseRequest;
-use petcircle\wangdian\requests\QueryStockoutOrderRequest;
-use petcircle\wangdian\requests\QueryStorageRequest;
-use petcircle\wangdian\requests\QueryTradeByMTimeRequest;
-use petcircle\wangdian\requests\QueryTradeByNORequest;
-use petcircle\wangdian\requests\SyncGoodsRequest;
-use petcircle\wangdian\requests\SyncLogisticsRequest;
-use petcircle\wangdian\requests\SyncStorageRequest;
+use petcircle\wangdian\requests;
 use petcircle\wangdian\results\BaseResult;
-use petcircle\wangdian\results\NewOrder;
 
 /**
  * 旺店通標準版sdk
@@ -103,7 +91,7 @@ class Standard
     /**
      * @var string
      */
-    private $logFile = './wangdian_standard.log';
+    private $logFile;
 
     /**
      * @var Logger
@@ -128,11 +116,11 @@ class Standard
      * 1.创建单据接口
      *
      * @param array $content
-     * @return \petcircle\wangdian\results\NewOrder
+     * @return \petcircle\wangdian\results\NewOrderResult
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function newOrder(NewOrderRequest $request)
+    public function newOrder(requests\NewOrderRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -145,7 +133,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function cancelOrder(CancelOrderRequest $request)
+    public function cancelOrder(requests\CancelOrderRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -154,11 +142,11 @@ class Standard
      * 3.查询货品库存信息
      *
      * @param QueryStorageRequest $requet
-     * @return \petcircle\wangdian\results\QueryStorage
+     * @return \petcircle\wangdian\results\QueryStorageResult
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryStorage(QueryStorageRequest $requet)
+    public function queryStorage(requests\QueryStorageRequest $requet)
     {
         return $this->post(__FUNCTION__, $requet);
     }
@@ -167,11 +155,11 @@ class Standard
      * 5.库存同步接口
      *
      * @param SyncStorageRequest $request
-     * @return \petcircle\wangdian\results\QueryStorage
+     * @return \petcircle\wangdian\results\QueryStorageResult
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function syncStorage(SyncStorageRequest $request)
+    public function syncStorage(requests\SyncStorageRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -180,11 +168,11 @@ class Standard
      * 6.查询订单接口(根据订单编号)
      *
      * @param QueryTradeByNORequest $request
-     * @return \petcircle\wangdian\results\QueryTradeByNO
+     * @return \petcircle\wangdian\results\QueryTradeByNOResult
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryTradeByNO(QueryTradeByNORequest $request)
+    public function queryTradeByNO(requests\QueryTradeByNORequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -193,11 +181,11 @@ class Standard
      * 7.查询订单接口(根据订单修改时间)
      *
      * @param QueryTradeByNORequest $request
-     * @return \petcircle\wangdian\results\QueryTradeByNO
+     * @return \petcircle\wangdian\results\QueryTradeByMTimeResult
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryTradeByMTime(QueryTradeByMTimeRequest $request)
+    public function queryTradeByMTime(requests\QueryTradeByMTimeRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -210,7 +198,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function syncLogistics(SyncLogisticsRequest $request)
+    public function syncLogistics(requests\SyncLogisticsRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -223,7 +211,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function syncGoods(SyncGoodsRequest $request)
+    public function syncGoods(requests\SyncGoodsRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -236,7 +224,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryStockoutOrder(QueryStockoutOrderRequest $request)
+    public function queryStockoutOrder(requests\QueryStockoutOrderRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -249,7 +237,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryStockinOrder(QueryStockinOrderRequest $request)
+    public function queryStockinOrder(requests\QueryStockinOrderRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -262,7 +250,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryGoodsInfo(QueryGoodsInfoRequest $request)
+    public function queryGoodsInfo(requests\QueryGoodsInfoRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -275,7 +263,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function queryStockoutOrderPurchaseReturnRequest(QueryStockoutOrderPurchaseReturnRequest $request)
+    public function queryStockoutOrderPurchaseReturnRequest(requests\QueryStockoutOrderPurchaseReturnRequest $request)
     {
         return $this->post(__FUNCTION__, $request);
     }
@@ -287,7 +275,7 @@ class Standard
      * @throws HttpResponseException
      * @throws \Exception
      */
-    public function post($method, AbstractRequest $request)
+    public function post($method, requests\AbstractRequest $request)
     {
         $method = ucfirst($method);
 
@@ -305,14 +293,15 @@ class Standard
             'Sign'        => $sign,
         ];
 
-        foreach ($data as $key => &$value) {
-            $value = urlencode($value);
-        }
 
         $url = $this->apiHost;
 
         if ($this->debug) {
             $this->getLogger()->info(sprintf("Request: %s:", $url), $data);
+        }
+
+        foreach ($data as $key => &$value) {
+            $value = urlencode($value);
         }
 
         $post_data = http_build_query($data);
@@ -377,11 +366,34 @@ class Standard
 
             $level = $this->debug ? Logger::DEBUG : Logger::ERROR;
 
-            $logger->pushHandler(new StreamHandler($this->logFile, $level));
+            $logger->pushHandler(new StreamHandler($this->getLogFile(), $level));
 
             $this->logger = $logger;
         }
 
         return $this->logger;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogFile()
+    {
+        if (! $this->logFile) {
+            $this->setLogFile(__DIR__ . '/wangdian_standard.log');
+        }
+
+        return $this->logFile;
+    }
+
+    /**
+     * @param string $logFile
+     * @return  $this
+     */
+    public function setLogFile($logFile)
+    {
+        $this->logFile = $logFile;
+
+        return $this;
     }
 }
