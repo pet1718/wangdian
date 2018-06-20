@@ -20,7 +20,7 @@ class QueryStockoutOrderRequest extends AbstractRequest
     /**
      * @var integer 不填查询所有类型， 1 查询销售出库单
      */
-    public $type;
+    public $Type;
 
     /**
      * @var integer 页码, 大于0的整数
